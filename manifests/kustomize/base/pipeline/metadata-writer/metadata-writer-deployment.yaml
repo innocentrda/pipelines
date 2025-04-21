@@ -15,9 +15,18 @@ spec:
         app: metadata-writer
     spec:
       initContainers:
-      - name: wait-for-mysql
+      - name: wait-for-grpc
         image: busybox
-        command: ['sh', '-c', 'until nc -z mysql.kubeflow.svc.cluster.local 3306; do echo waiting for mysql; sleep 5; done;']
+        command:
+          - sh
+          - -c
+          - |
+            echo "Waiting for metadata-grpc to be available...";
+            until nc -z metadata-grpc-service.kubeflow.svc.cluster.local 8080; do
+              echo "metadata-grpc not ready yet... sleeping";
+              sleep 5;
+            done;
+            echo "metadata-grpc is ready.";
       containers:
       - name: main
         image: ghcr.io/kubeflow/kfp-metadata-writer:dummy

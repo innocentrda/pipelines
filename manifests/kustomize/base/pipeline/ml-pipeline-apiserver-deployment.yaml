@@ -15,6 +15,10 @@ spec:
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox
+        command: ['sh', '-c', 'until nc -z mysql.kubeflow.svc.cluster.local 3306; do echo waiting for mysql; sleep 5; done;']
       containers:
       - env:
         - name: LOG_LEVEL

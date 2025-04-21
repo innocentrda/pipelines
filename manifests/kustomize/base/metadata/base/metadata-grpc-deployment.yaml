@@ -14,7 +14,14 @@ spec:
       labels:
         component: metadata-grpc-server
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox
+        command: ['sh', '-c', 'until nc -z mysql.kubeflow.svc.cluster.local 3306; do echo waiting for mysql; sleep 5; done;']
       - name: container
         # ! Sync to the same MLMD version:
         # * backend/metadata_writer/requirements.in and requirements.txt
